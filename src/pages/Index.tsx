@@ -4,9 +4,11 @@ import { ProductSection } from "@/components/ProductSection";
 import { ProductFilters } from "@/components/ProductFilters";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { PRODUCTS, MONTHS, type Category } from "@/data/products";
+import { MONTHS, type Category } from "@/data/products";
+import { useActiveProducts } from "@/hooks/useProducts";
 
 const Index = () => {
+  const { products } = useActiveProducts();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
   const [month, setMonth] = useState<number | "all">("all");
@@ -19,7 +21,7 @@ const Index = () => {
   const normalizedSearch = search.trim().toLowerCase();
 
   const filtered = useMemo(() => {
-    return PRODUCTS.filter((p) => {
+    return products.filter((p) => {
       if (category !== "all" && p.category !== category) return false;
       if (month !== "all" && p.month !== month) return false;
       if (normalizedSearch) {
@@ -28,7 +30,7 @@ const Index = () => {
       }
       return true;
     });
-  }, [category, month, normalizedSearch]);
+  }, [products, category, month, normalizedSearch]);
 
   const hasActiveFilter = category !== "all" || month !== "all" || normalizedSearch.length > 0;
 
