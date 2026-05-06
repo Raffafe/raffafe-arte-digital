@@ -8,7 +8,7 @@ import { MONTHS, type Category } from "@/data/products";
 import { useActiveProducts } from "@/hooks/useProducts";
 
 const Index = () => {
-  const { products, loading } = useActiveProducts();
+  const { products } = useActiveProducts();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
   const [month, setMonth] = useState<number | "all">("all");
