@@ -11,7 +11,7 @@ export const SiteHeader = ({ search, onSearchChange }: SiteHeaderProps) => {
     <header className="relative overflow-hidden">
       <div className="absolute inset-0 bg-watercolor opacity-70" aria-hidden />
       <div className="relative container mx-auto px-4 py-12 md:py-16 text-center">
-        <h1 className="text-4xl text-foreground tracking-tight font-serif md:text-8xl">
+        <h1 className="text-4xl text-foreground tracking-tight font-serif md:text-5xl">
           Raffafe<span className="text-primary">.arte</span>
         </h1>
         <p className="mt-3 text-base md:text-lg text-muted-foreground font-body">
