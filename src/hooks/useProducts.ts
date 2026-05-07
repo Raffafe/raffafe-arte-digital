@@ -16,6 +16,17 @@ export interface DbProduct {
   created_at: string;
 }
 
+export interface AdminUser {
+  id: string;
+  user_id: string;
+  email: string;
+  status: "pending" | "approved" | "rejected";
+  requested_role: "admin" | "user";
+  approved_role: "admin" | "user" | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export const dbToProduct = (p: DbProduct): Product => ({
   id: p.id,
   title: p.titulo,
