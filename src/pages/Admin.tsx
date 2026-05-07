@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
   Dialog,
@@ -29,7 +30,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { CATEGORIES, MONTHS } from "@/data/products";
-import type { DbProduct } from "@/hooks/useProducts";
+import type { AdminUser, DbProduct } from "@/hooks/useProducts";
 import { useNavigate } from "react-router-dom";
 
 interface FormState {
@@ -60,19 +61,25 @@ const empty: FormState = {
 const Admin = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<DbProduct[]>([]);
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
+  const [actingUserId, setActingUserId] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from("produtos")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    else setItems((data ?? []) as DbProduct[]);
+    const [productsResult, usersResult] = await Promise.all([
+      supabase.from("produtos").select("*").order("created_at", { ascending: false }),
+      supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
+    ]);
+
+    if (productsResult.error) toast.error(productsResult.error.message);
+    else setItems((productsResult.data ?? []) as DbProduct[]);
+
+    if (usersResult.error) toast.error(usersResult.error.message);
+    else setUsers((usersResult.data ?? []) as AdminUser[]);
     setLoading(false);
   };
 
@@ -157,6 +164,61 @@ const Admin = () => {
     navigate("/admin/login");
   };
 
+  const approveUser = async (user: AdminUser, role: "admin" | "user") => {
+    setActingUserId(user.user_id);
+    const { error: updateError } = await supabase
+      .from("admin_users")
+      .update({ status: "approved", approved_role: role })
+      .eq("user_id", user.user_id);
+
+    if (updateError) {
+      toast.error(updateError.message);
+      setActingUserId(null);
+      return;
+    }
+
+    const { error: deleteError } = await supabase.from("user_roles").delete().eq("user_id", user.user_id);
+    if (deleteError) {
+      toast.error(deleteError.message);
+      setActingUserId(null);
+      return;
+    }
+
+    const { error: roleError } = await supabase.from("user_roles").insert({ user_id: user.user_id, role });
+    setActingUserId(null);
+    if (roleError) {
+      toast.error(roleError.message);
+      return;
+    }
+    toast.success(role === "admin" ? "Usuário aprovado como admin" : "Usuário aprovado como user");
+    load();
+  };
+
+  const rejectUser = async (user: AdminUser) => {
+    if (!confirm(`Recusar acesso de ${user.email}?`)) return;
+    setActingUserId(user.user_id);
+    const { error: updateError } = await supabase
+      .from("admin_users")
+      .update({ status: "rejected", approved_role: null })
+      .eq("user_id", user.user_id);
+
+    if (updateError) {
+      toast.error(updateError.message);
+      setActingUserId(null);
+      return;
+    }
+
+    const { error: deleteError } = await supabase.from("user_roles").delete().eq("user_id", user.user_id);
+    setActingUserId(null);
+    if (deleteError) toast.error(deleteError.message);
+    else {
+      toast.success("Usuário recusado");
+      load();
+    }
+  };
+
+  const pendingUsers = users.filter((user) => user.status === "pending");
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-card/40 backdrop-blur">
@@ -217,6 +279,76 @@ const Admin = () => {
             </Table>
           )}
         </Card>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-display text-3xl">Usuários</h2>
+            <p className="text-sm text-muted-foreground">
+              {pendingUsers.length} cadastro{pendingUsers.length === 1 ? "" : "s"} pendente
+              {pendingUsers.length === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          <Card className="rounded-2xl">
+            {loading ? (
+              <div className="p-10 text-center text-muted-foreground">Carregando usuários...</div>
+            ) : pendingUsers.length === 0 ? (
+              <div className="p-10 text-center text-muted-foreground">
+                Nenhum usuário pendente no momento.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>E-mail</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Solicitado em</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">Pendente</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => approveUser(user, "user")}
+                        >
+                          Aprovar user
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => approveUser(user, "admin")}
+                        >
+                          Aprovar admin
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => rejectUser(user)}
+                          className="text-destructive"
+                        >
+                          Recusar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </section>
       </main>
 
       <Dialog open={open} onOpenChange={setOpen}>
