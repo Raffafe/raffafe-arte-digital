@@ -279,6 +279,76 @@ const Admin = () => {
             </Table>
           )}
         </Card>
+
+        <section className="space-y-4">
+          <div>
+            <h2 className="font-display text-3xl">Usuários</h2>
+            <p className="text-sm text-muted-foreground">
+              {pendingUsers.length} cadastro{pendingUsers.length === 1 ? "" : "s"} pendente
+              {pendingUsers.length === 1 ? "" : "s"}
+            </p>
+          </div>
+
+          <Card className="rounded-2xl">
+            {loading ? (
+              <div className="p-10 text-center text-muted-foreground">Carregando usuários...</div>
+            ) : pendingUsers.length === 0 ? (
+              <div className="p-10 text-center text-muted-foreground">
+                Nenhum usuário pendente no momento.
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>E-mail</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Solicitado em</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">Pendente</Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => approveUser(user, "user")}
+                        >
+                          Aprovar user
+                        </Button>
+                        <Button
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => approveUser(user, "admin")}
+                        >
+                          Aprovar admin
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={actingUserId === user.user_id}
+                          onClick={() => rejectUser(user)}
+                          className="text-destructive"
+                        >
+                          Recusar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </section>
       </main>
 
       <Dialog open={open} onOpenChange={setOpen}>
