@@ -439,7 +439,24 @@ const Admin = () => {
             </div>
             <div className="space-y-2">
               <Label>Link Hotmart</Label>
-              <Input value={form.link_hotmart} onChange={(e) => setForm({ ...form, link_hotmart: e.target.value })} placeholder="https://..." />
+              <div className="flex gap-2">
+                <Input
+                  value={form.link_hotmart}
+                  onChange={(e) => setForm({ ...form, link_hotmart: e.target.value })}
+                  placeholder="https://pay.hotmart.com/..."
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={importFromHotmart}
+                  disabled={importing}
+                >
+                  {importing ? "Importando..." : "Importar dados"}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Cole o link e clique em "Importar dados" para preencher título, imagem e preço automaticamente. Tudo permanece editável.
+              </p>
             </div>
             <div className="flex items-center gap-3 pt-2">
               <Switch checked={form.ativo} onCheckedChange={(v) => setForm({ ...form, ativo: v })} />
