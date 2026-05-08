@@ -67,6 +67,40 @@ const Admin = () => {
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
   const [actingUserId, setActingUserId] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+
+  const importFromHotmart = async () => {
+    const url = form.link_hotmart.trim();
+    if (!url || !/^https?:\/\//.test(url)) {
+      toast.error("Cole um link válido da Hotmart primeiro");
+      return;
+    }
+    setImporting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("import-hotmart", {
+        body: { url },
+      });
+      if (error) throw error;
+      const next = { ...form };
+      let imported = 0;
+      let missed = 0;
+      if (data?.title) { next.titulo = data.title; imported++; } else missed++;
+      if (data?.image) { next.imagem_url = data.image; imported++; } else missed++;
+      if (data?.price != null) { next.preco = String(data.price); imported++; } else missed++;
+      setForm(next);
+      if (imported === 0) {
+        toast.warning("Algumas informações não puderam ser importadas automaticamente.");
+      } else if (missed > 0) {
+        toast.success("Dados importados. Algumas informações não puderam ser importadas automaticamente.");
+      } else {
+        toast.success("Dados importados com sucesso");
+      }
+    } catch (e: any) {
+      toast.warning("Algumas informações não puderam ser importadas automaticamente.");
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
