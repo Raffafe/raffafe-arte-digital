@@ -35,7 +35,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
             className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             <a href={product.hotmartUrl} aria-label={`Ver material ${product.title}`}>
-              Ver material
+              Adquirir material
             </a>
           </Button>
         </div>
