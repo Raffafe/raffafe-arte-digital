@@ -80,23 +80,37 @@ const Admin = () => {
       const { data, error } = await supabase.functions.invoke("import-hotmart", {
         body: { url },
       });
-      if (error) throw error;
+      if (error) {
+        console.error("import-hotmart invoke error:", error);
+        toast.error(`Erro ao chamar a função: ${error.message ?? error}`);
+        return;
+      }
+      console.log("import-hotmart response:", data);
+      if (data?.blocked) {
+        toast.error(data.error || "A Hotmart bloqueou a importação automática desta página. Preencha manualmente.");
+        return;
+      }
+      if (data?.error && !data?.title && !data?.image && data?.price == null) {
+        toast.error(`Falha técnica: ${data.error}`);
+        return;
+      }
       const next = { ...form };
       let imported = 0;
-      let missed = 0;
-      if (data?.title) { next.titulo = data.title; imported++; } else missed++;
-      if (data?.image) { next.imagem_url = data.image; imported++; } else missed++;
-      if (data?.price != null) { next.preco = String(data.price); imported++; } else missed++;
+      const missing: string[] = [];
+      if (data?.title) { next.titulo = data.title; imported++; } else missing.push("título");
+      if (data?.image) { next.imagem_url = data.image; imported++; } else missing.push("imagem");
+      if (data?.price != null) { next.preco = String(data.price); imported++; } else missing.push("preço");
       setForm(next);
       if (imported === 0) {
-        toast.warning("Algumas informações não puderam ser importadas automaticamente.");
-      } else if (missed > 0) {
-        toast.success("Dados importados. Algumas informações não puderam ser importadas automaticamente.");
+        toast.warning("Nenhum dado pôde ser importado. Preencha manualmente.");
+      } else if (missing.length > 0) {
+        toast.success(`Importado. Não encontrado: ${missing.join(", ")}.`);
       } else {
         toast.success("Dados importados com sucesso");
       }
     } catch (e: any) {
-      toast.warning("Algumas informações não puderam ser importadas automaticamente.");
+      console.error("import-hotmart exception:", e);
+      toast.error(`Erro inesperado: ${e?.message ?? String(e)}`);
     } finally {
       setImporting(false);
     }
