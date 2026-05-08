@@ -12,7 +12,7 @@ import { Eye, EyeOff } from "lucide-react";
 const AdminLogin = () => {
   const navigate = useNavigate();
   const { user, isAdmin, loading } = useAuth();
-  const [email, setEmail] = useState("irsf84@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [showPassword, setShowPassword] = useState(false);
