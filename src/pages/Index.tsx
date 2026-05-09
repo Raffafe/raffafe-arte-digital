@@ -12,7 +12,11 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
   const [month, setMonth] = useState<number | "all">("all");
-  const [tab, setTab] = useState("loja");
+  const [tab, setTab] = useState(() =>
+    typeof window !== "undefined" && window.location.hash.replace("#", "") === "atividades"
+      ? "atividades"
+      : "loja",
+  );
 
   const now = new Date();
   const currentMonth = now.getMonth() + 1; // 1-12
