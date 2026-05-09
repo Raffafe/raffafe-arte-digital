@@ -487,6 +487,54 @@ const Admin = () => {
             )}
           </Card>
         </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-3xl">Atividades</h2>
+              <p className="text-sm text-muted-foreground">{atividades.length} cadastrada{atividades.length === 1 ? "" : "s"}</p>
+            </div>
+            <Button onClick={openNewAtividade} className="rounded-full">+ Nova atividade</Button>
+          </div>
+
+          <Card className="rounded-2xl">
+            {loading ? (
+              <div className="p-10 text-center text-muted-foreground">Carregando...</div>
+            ) : atividades.length === 0 ? (
+              <div className="p-10 text-center text-muted-foreground">
+                Nenhuma atividade ainda. Clique em "Nova atividade".
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Mídia</TableHead>
+                    <TableHead>Ativo</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {atividades.map((a) => (
+                    <TableRow key={a.id}>
+                      <TableCell className="font-medium">{a.titulo}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {a.video_url ? "Vídeo/Link" : a.imagem_url ? "Imagem" : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <Switch checked={a.ativo} onCheckedChange={() => toggleAtividadeActive(a)} />
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button variant="ghost" size="sm" onClick={() => openEditAtividade(a)}>Editar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => removeAtividade(a)} className="text-destructive">Excluir</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </section>
       </main>
 
       <Dialog open={open} onOpenChange={setOpen}>
