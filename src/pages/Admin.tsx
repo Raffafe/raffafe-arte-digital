@@ -91,6 +91,7 @@ const Admin = () => {
   const [atvOpen, setAtvOpen] = useState(false);
   const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
   const [atvSaving, setAtvSaving] = useState(false);
+  const [section, setSection] = useState<"produtos" | "atividades" | "usuarios">("produtos");
 
   const importFromHotmart = async () => {
     const url = form.link_hotmart.trim();
@@ -357,184 +358,215 @@ const Admin = () => {
   };
 
 
+  const navItems: { key: typeof section; label: string }[] = [
+    { key: "produtos", label: "Produtos" },
+    { key: "atividades", label: "Atividades" },
+    { key: "usuarios", label: "Usuários" },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border/60 bg-card/40 backdrop-blur">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b border-border/60 bg-card/40 backdrop-blur sticky top-0 z-30">
+        <div className="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl">Painel • Raffafe.arte</h1>
-          <div className="flex gap-2">
-            <Button variant="ghost" onClick={() => navigate("/")}>Ver loja</Button>
-            <Button variant="outline" onClick={logout}>Sair</Button>
+          <nav className="flex flex-wrap items-center gap-1 rounded-full bg-background/60 border border-border/60 p-1">
+            {navItems.map((item) => (
+              <Button
+                key={item.key}
+                variant={section === item.key ? "default" : "ghost"}
+                size="sm"
+                className="rounded-full"
+                onClick={() => setSection(item.key)}
+              >
+                {item.label}
+                {item.key === "usuarios" && pendingUsers.length > 0 && (
+                  <Badge variant="secondary" className="ml-2">{pendingUsers.length}</Badge>
+                )}
+              </Button>
+            ))}
+          </nav>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>Ver loja</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/#atividades")}>Ver atividades</Button>
+            <Button variant="outline" size="sm" onClick={logout}>Sair</Button>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-3xl">Produtos</h2>
-            <p className="text-sm text-muted-foreground">{items.length} cadastrados</p>
-          </div>
-          <Button onClick={openNew} className="rounded-full">+ Novo produto</Button>
-        </div>
-
-        <Card className="rounded-2xl">
-          {loading ? (
-            <div className="p-10 text-center text-muted-foreground">Carregando...</div>
-          ) : items.length === 0 ? (
-            <div className="p-10 text-center text-muted-foreground">
-              Nenhum produto ainda. Clique em "Novo produto".
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead>Mês</TableHead>
-                  <TableHead>Preço</TableHead>
-                  <TableHead>Ativo</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {items.map((p) => (
-                  <TableRow key={p.id}>
-                    <TableCell className="font-medium">{p.titulo}</TableCell>
-                    <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
-                    <TableCell>{MONTHS[p.mes - 1]}</TableCell>
-                    <TableCell>R$ {Number(p.preco).toFixed(2)}</TableCell>
-                    <TableCell>
-                      <Switch checked={p.ativo} onCheckedChange={() => toggleActive(p)} />
-                    </TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>Editar</Button>
-                      <Button variant="ghost" size="sm" onClick={() => remove(p)} className="text-destructive">Excluir</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </Card>
-
-        <section className="space-y-4">
-          <div>
-            <h2 className="font-display text-3xl">Usuários</h2>
-            <p className="text-sm text-muted-foreground">
-              {pendingUsers.length} cadastro{pendingUsers.length === 1 ? "" : "s"} pendente
-              {pendingUsers.length === 1 ? "" : "s"}
-            </p>
-          </div>
-
-          <Card className="rounded-2xl">
-            {loading ? (
-              <div className="p-10 text-center text-muted-foreground">Carregando usuários...</div>
-            ) : pendingUsers.length === 0 ? (
-              <div className="p-10 text-center text-muted-foreground">
-                Nenhum usuário pendente no momento.
+        {section === "produtos" && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-3xl">Produtos</h2>
+                <p className="text-sm text-muted-foreground">{items.length} cadastrados</p>
               </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>E-mail</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Solicitado em</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.email}</TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">Pendente</Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(user.created_at).toLocaleDateString("pt-BR")}
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={actingUserId === user.user_id}
-                          onClick={() => approveUser(user, "user")}
-                        >
-                          Aprovar user
-                        </Button>
-                        <Button
-                          size="sm"
-                          disabled={actingUserId === user.user_id}
-                          onClick={() => approveUser(user, "admin")}
-                        >
-                          Aprovar admin
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={actingUserId === user.user_id}
-                          onClick={() => rejectUser(user)}
-                          className="text-destructive"
-                        >
-                          Recusar
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </Card>
-        </section>
+              <Button onClick={openNew} className="rounded-full">+ Novo produto</Button>
+            </div>
 
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
+            <Card className="rounded-2xl">
+              {loading ? (
+                <div className="p-10 text-center text-muted-foreground">Carregando...</div>
+              ) : items.length === 0 ? (
+                <div className="p-10 text-center text-muted-foreground">
+                  Nenhum produto ainda. Clique em "Novo produto".
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Categoria</TableHead>
+                      <TableHead>Mês</TableHead>
+                      <TableHead>Preço</TableHead>
+                      <TableHead>Ativo</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((p) => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-medium">{p.titulo}</TableCell>
+                        <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
+                        <TableCell>{MONTHS[p.mes - 1]}</TableCell>
+                        <TableCell>R$ {Number(p.preco).toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Switch checked={p.ativo} onCheckedChange={() => toggleActive(p)} />
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEdit(p)}>Editar</Button>
+                          <Button variant="ghost" size="sm" onClick={() => remove(p)} className="text-destructive">Excluir</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+          </section>
+        )}
+
+        {section === "usuarios" && (
+          <section className="space-y-4">
             <div>
-              <h2 className="font-display text-3xl">Atividades</h2>
-              <p className="text-sm text-muted-foreground">{atividades.length} cadastrada{atividades.length === 1 ? "" : "s"}</p>
+              <h2 className="font-display text-3xl">Usuários</h2>
+              <p className="text-sm text-muted-foreground">
+                {pendingUsers.length} cadastro{pendingUsers.length === 1 ? "" : "s"} pendente
+                {pendingUsers.length === 1 ? "" : "s"}
+              </p>
             </div>
-            <Button onClick={openNewAtividade} className="rounded-full">+ Nova atividade</Button>
-          </div>
 
-          <Card className="rounded-2xl">
-            {loading ? (
-              <div className="p-10 text-center text-muted-foreground">Carregando...</div>
-            ) : atividades.length === 0 ? (
-              <div className="p-10 text-center text-muted-foreground">
-                Nenhuma atividade ainda. Clique em "Nova atividade".
-              </div>
-            ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Título</TableHead>
-                    <TableHead>Mídia</TableHead>
-                    <TableHead>Ativo</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {atividades.map((a) => (
-                    <TableRow key={a.id}>
-                      <TableCell className="font-medium">{a.titulo}</TableCell>
-                      <TableCell className="text-muted-foreground text-sm">
-                        {a.video_url ? "Vídeo/Link" : a.imagem_url ? "Imagem" : "—"}
-                      </TableCell>
-                      <TableCell>
-                        <Switch checked={a.ativo} onCheckedChange={() => toggleAtividadeActive(a)} />
-                      </TableCell>
-                      <TableCell className="text-right space-x-2">
-                        <Button variant="ghost" size="sm" onClick={() => openEditAtividade(a)}>Editar</Button>
-                        <Button variant="ghost" size="sm" onClick={() => removeAtividade(a)} className="text-destructive">Excluir</Button>
-                      </TableCell>
+            <Card className="rounded-2xl">
+              {loading ? (
+                <div className="p-10 text-center text-muted-foreground">Carregando usuários...</div>
+              ) : pendingUsers.length === 0 ? (
+                <div className="p-10 text-center text-muted-foreground">
+                  Nenhum usuário pendente no momento.
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>E-mail</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Solicitado em</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </Card>
-        </section>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">Pendente</Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {new Date(user.created_at).toLocaleDateString("pt-BR")}
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={actingUserId === user.user_id}
+                            onClick={() => approveUser(user, "user")}
+                          >
+                            Aprovar user
+                          </Button>
+                          <Button
+                            size="sm"
+                            disabled={actingUserId === user.user_id}
+                            onClick={() => approveUser(user, "admin")}
+                          >
+                            Aprovar admin
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={actingUserId === user.user_id}
+                            onClick={() => rejectUser(user)}
+                            className="text-destructive"
+                          >
+                            Recusar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+          </section>
+        )}
+
+        {section === "atividades" && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-3xl">Atividades</h2>
+                <p className="text-sm text-muted-foreground">{atividades.length} cadastrada{atividades.length === 1 ? "" : "s"}</p>
+              </div>
+              <Button onClick={openNewAtividade} className="rounded-full">+ Nova atividade</Button>
+            </div>
+
+            <Card className="rounded-2xl">
+              {loading ? (
+                <div className="p-10 text-center text-muted-foreground">Carregando...</div>
+              ) : atividades.length === 0 ? (
+                <div className="p-10 text-center text-muted-foreground">
+                  Nenhuma atividade ainda. Clique em "Nova atividade".
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Título</TableHead>
+                      <TableHead>Mídia</TableHead>
+                      <TableHead>Ativo</TableHead>
+                      <TableHead className="text-right">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {atividades.map((a) => (
+                      <TableRow key={a.id}>
+                        <TableCell className="font-medium">{a.titulo}</TableCell>
+                        <TableCell className="text-muted-foreground text-sm">
+                          {a.video_url ? "Vídeo/Link" : a.imagem_url ? "Imagem" : "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Switch checked={a.ativo} onCheckedChange={() => toggleAtividadeActive(a)} />
+                        </TableCell>
+                        <TableCell className="text-right space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => openEditAtividade(a)}>Editar</Button>
+                          <Button variant="ghost" size="sm" onClick={() => removeAtividade(a)} className="text-destructive">Excluir</Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </Card>
+          </section>
+        )}
       </main>
 
       <Dialog open={open} onOpenChange={setOpen}>
