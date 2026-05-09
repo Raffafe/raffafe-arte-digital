@@ -141,9 +141,10 @@ const Admin = () => {
 
   const load = async () => {
     setLoading(true);
-    const [productsResult, usersResult] = await Promise.all([
+    const [productsResult, usersResult, atividadesResult] = await Promise.all([
       supabase.from("produtos").select("*").order("created_at", { ascending: false }),
       supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
+      supabase.from("atividades").select("*").order("created_at", { ascending: false }),
     ]);
 
     if (productsResult.error) toast.error(productsResult.error.message);
@@ -151,6 +152,9 @@ const Admin = () => {
 
     if (usersResult.error) toast.error(usersResult.error.message);
     else setUsers((usersResult.data ?? []) as AdminUser[]);
+
+    if (atividadesResult.error) toast.error(atividadesResult.error.message);
+    else setAtividades((atividadesResult.data ?? []) as DbAtividade[]);
     setLoading(false);
   };
 
