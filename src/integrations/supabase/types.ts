@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      atividades: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          imagem_url: string | null
+          texto_curto: string | null
+          titulo: string
+          video_url: string | null
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          texto_curto?: string | null
+          titulo: string
+          video_url?: string | null
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          imagem_url?: string | null
+          texto_curto?: string | null
+          titulo?: string
+          video_url?: string | null
+        }
+        Relationships: []
+      }
       produtos: {
         Row: {
           ativo: boolean

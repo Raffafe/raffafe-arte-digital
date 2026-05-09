@@ -31,7 +31,9 @@ import {
 import { toast } from "sonner";
 import { CATEGORIES, MONTHS } from "@/data/products";
 import type { AdminUser, DbProduct } from "@/hooks/useProducts";
+import type { DbAtividade } from "@/hooks/useAtividades";
 import { useNavigate } from "react-router-dom";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FormState {
   id?: string;
@@ -58,16 +60,37 @@ const empty: FormState = {
   ativo: true,
 };
 
+interface AtividadeForm {
+  id?: string;
+  titulo: string;
+  texto_curto: string;
+  imagem_url: string;
+  video_url: string;
+  ativo: boolean;
+}
+
+const emptyAtividade: AtividadeForm = {
+  titulo: "",
+  texto_curto: "",
+  imagem_url: "",
+  video_url: "",
+  ativo: true,
+};
+
 const Admin = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<DbProduct[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [atividades, setAtividades] = useState<DbAtividade[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
   const [actingUserId, setActingUserId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [atvOpen, setAtvOpen] = useState(false);
+  const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
+  const [atvSaving, setAtvSaving] = useState(false);
 
   const importFromHotmart = async () => {
     const url = form.link_hotmart.trim();
@@ -118,9 +141,10 @@ const Admin = () => {
 
   const load = async () => {
     setLoading(true);
-    const [productsResult, usersResult] = await Promise.all([
+    const [productsResult, usersResult, atividadesResult] = await Promise.all([
       supabase.from("produtos").select("*").order("created_at", { ascending: false }),
       supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
+      supabase.from("atividades").select("*").order("created_at", { ascending: false }),
     ]);
 
     if (productsResult.error) toast.error(productsResult.error.message);
@@ -128,6 +152,9 @@ const Admin = () => {
 
     if (usersResult.error) toast.error(usersResult.error.message);
     else setUsers((usersResult.data ?? []) as AdminUser[]);
+
+    if (atividadesResult.error) toast.error(atividadesResult.error.message);
+    else setAtividades((atividadesResult.data ?? []) as DbAtividade[]);
     setLoading(false);
   };
 
@@ -267,6 +294,69 @@ const Admin = () => {
 
   const pendingUsers = users.filter((user) => user.status === "pending");
 
+  const openNewAtividade = () => {
+    setAtvForm(emptyAtividade);
+    setAtvOpen(true);
+  };
+
+  const openEditAtividade = (a: DbAtividade) => {
+    setAtvForm({
+      id: a.id,
+      titulo: a.titulo,
+      texto_curto: a.texto_curto ?? "",
+      imagem_url: a.imagem_url ?? "",
+      video_url: a.video_url ?? "",
+      ativo: a.ativo,
+    });
+    setAtvOpen(true);
+  };
+
+  const saveAtividade = async () => {
+    if (!atvForm.titulo.trim()) {
+      toast.error("Título é obrigatório");
+      return;
+    }
+    setAtvSaving(true);
+    const payload = {
+      titulo: atvForm.titulo.trim(),
+      texto_curto: atvForm.texto_curto || null,
+      imagem_url: atvForm.imagem_url || null,
+      video_url: atvForm.video_url || null,
+      ativo: atvForm.ativo,
+    };
+    const { error } = atvForm.id
+      ? await supabase.from("atividades").update(payload).eq("id", atvForm.id)
+      : await supabase.from("atividades").insert(payload);
+    setAtvSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(atvForm.id ? "Atividade atualizada" : "Atividade criada");
+    setAtvOpen(false);
+    load();
+  };
+
+  const toggleAtividadeActive = async (a: DbAtividade) => {
+    const { error } = await supabase
+      .from("atividades")
+      .update({ ativo: !a.ativo })
+      .eq("id", a.id);
+    if (error) toast.error(error.message);
+    else setAtividades((prev) => prev.map((i) => (i.id === a.id ? { ...i, ativo: !a.ativo } : i)));
+  };
+
+  const removeAtividade = async (a: DbAtividade) => {
+    if (!confirm(`Excluir "${a.titulo}"?`)) return;
+    const { error } = await supabase.from("atividades").delete().eq("id", a.id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Excluído");
+      setAtividades((prev) => prev.filter((i) => i.id !== a.id));
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-card/40 backdrop-blur">
@@ -397,6 +487,54 @@ const Admin = () => {
             )}
           </Card>
         </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-3xl">Atividades</h2>
+              <p className="text-sm text-muted-foreground">{atividades.length} cadastrada{atividades.length === 1 ? "" : "s"}</p>
+            </div>
+            <Button onClick={openNewAtividade} className="rounded-full">+ Nova atividade</Button>
+          </div>
+
+          <Card className="rounded-2xl">
+            {loading ? (
+              <div className="p-10 text-center text-muted-foreground">Carregando...</div>
+            ) : atividades.length === 0 ? (
+              <div className="p-10 text-center text-muted-foreground">
+                Nenhuma atividade ainda. Clique em "Nova atividade".
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Título</TableHead>
+                    <TableHead>Mídia</TableHead>
+                    <TableHead>Ativo</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {atividades.map((a) => (
+                    <TableRow key={a.id}>
+                      <TableCell className="font-medium">{a.titulo}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {a.video_url ? "Vídeo/Link" : a.imagem_url ? "Imagem" : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <Switch checked={a.ativo} onCheckedChange={() => toggleAtividadeActive(a)} />
+                      </TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button variant="ghost" size="sm" onClick={() => openEditAtividade(a)}>Editar</Button>
+                        <Button variant="ghost" size="sm" onClick={() => removeAtividade(a)} className="text-destructive">Excluir</Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </Card>
+        </section>
       </main>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -480,6 +618,55 @@ const Admin = () => {
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button onClick={save} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={atvOpen} onOpenChange={setAtvOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{atvForm.id ? "Editar atividade" : "Nova atividade"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input value={atvForm.titulo} onChange={(e) => setAtvForm({ ...atvForm, titulo: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Texto curto</Label>
+              <Textarea
+                value={atvForm.texto_curto}
+                onChange={(e) => setAtvForm({ ...atvForm, texto_curto: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Imagem de capa (URL)</Label>
+              <Input
+                value={atvForm.imagem_url}
+                onChange={(e) => setAtvForm({ ...atvForm, imagem_url: e.target.value })}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Link do vídeo ou post</Label>
+              <Input
+                value={atvForm.video_url}
+                onChange={(e) => setAtvForm({ ...atvForm, video_url: e.target.value })}
+                placeholder="YouTube, Instagram ou Pinterest"
+              />
+              <p className="text-xs text-muted-foreground">
+                YouTube é incorporado como vídeo. Instagram/Pinterest aparecem como link externo.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <Switch checked={atvForm.ativo} onCheckedChange={(v) => setAtvForm({ ...atvForm, ativo: v })} />
+              <Label>Ativa (aparece na área pública)</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setAtvOpen(false)}>Cancelar</Button>
+            <Button onClick={saveAtividade} disabled={atvSaving}>{atvSaving ? "Salvando..." : "Salvar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
