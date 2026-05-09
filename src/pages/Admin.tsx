@@ -60,16 +60,37 @@ const empty: FormState = {
   ativo: true,
 };
 
+interface AtividadeForm {
+  id?: string;
+  titulo: string;
+  texto_curto: string;
+  imagem_url: string;
+  video_url: string;
+  ativo: boolean;
+}
+
+const emptyAtividade: AtividadeForm = {
+  titulo: "",
+  texto_curto: "",
+  imagem_url: "",
+  video_url: "",
+  ativo: true,
+};
+
 const Admin = () => {
   const navigate = useNavigate();
   const [items, setItems] = useState<DbProduct[]>([]);
   const [users, setUsers] = useState<AdminUser[]>([]);
+  const [atividades, setAtividades] = useState<DbAtividade[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(empty);
   const [saving, setSaving] = useState(false);
   const [actingUserId, setActingUserId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
+  const [atvOpen, setAtvOpen] = useState(false);
+  const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
+  const [atvSaving, setAtvSaving] = useState(false);
 
   const importFromHotmart = async () => {
     const url = form.link_hotmart.trim();
