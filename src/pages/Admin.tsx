@@ -621,6 +621,55 @@ const Admin = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={atvOpen} onOpenChange={setAtvOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{atvForm.id ? "Editar atividade" : "Nova atividade"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[70vh] overflow-y-auto pr-1">
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input value={atvForm.titulo} onChange={(e) => setAtvForm({ ...atvForm, titulo: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Texto curto</Label>
+              <Textarea
+                value={atvForm.texto_curto}
+                onChange={(e) => setAtvForm({ ...atvForm, texto_curto: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Imagem de capa (URL)</Label>
+              <Input
+                value={atvForm.imagem_url}
+                onChange={(e) => setAtvForm({ ...atvForm, imagem_url: e.target.value })}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Link do vídeo ou post</Label>
+              <Input
+                value={atvForm.video_url}
+                onChange={(e) => setAtvForm({ ...atvForm, video_url: e.target.value })}
+                placeholder="YouTube, Instagram ou Pinterest"
+              />
+              <p className="text-xs text-muted-foreground">
+                YouTube é incorporado como vídeo. Instagram/Pinterest aparecem como link externo.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <Switch checked={atvForm.ativo} onCheckedChange={(v) => setAtvForm({ ...atvForm, ativo: v })} />
+              <Label>Ativa (aparece na área pública)</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setAtvOpen(false)}>Cancelar</Button>
+            <Button onClick={saveAtividade} disabled={atvSaving}>{atvSaving ? "Salvando..." : "Salvar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
