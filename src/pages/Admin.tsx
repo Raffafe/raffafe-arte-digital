@@ -294,6 +294,69 @@ const Admin = () => {
 
   const pendingUsers = users.filter((user) => user.status === "pending");
 
+  const openNewAtividade = () => {
+    setAtvForm(emptyAtividade);
+    setAtvOpen(true);
+  };
+
+  const openEditAtividade = (a: DbAtividade) => {
+    setAtvForm({
+      id: a.id,
+      titulo: a.titulo,
+      texto_curto: a.texto_curto ?? "",
+      imagem_url: a.imagem_url ?? "",
+      video_url: a.video_url ?? "",
+      ativo: a.ativo,
+    });
+    setAtvOpen(true);
+  };
+
+  const saveAtividade = async () => {
+    if (!atvForm.titulo.trim()) {
+      toast.error("Título é obrigatório");
+      return;
+    }
+    setAtvSaving(true);
+    const payload = {
+      titulo: atvForm.titulo.trim(),
+      texto_curto: atvForm.texto_curto || null,
+      imagem_url: atvForm.imagem_url || null,
+      video_url: atvForm.video_url || null,
+      ativo: atvForm.ativo,
+    };
+    const { error } = atvForm.id
+      ? await supabase.from("atividades").update(payload).eq("id", atvForm.id)
+      : await supabase.from("atividades").insert(payload);
+    setAtvSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(atvForm.id ? "Atividade atualizada" : "Atividade criada");
+    setAtvOpen(false);
+    load();
+  };
+
+  const toggleAtividadeActive = async (a: DbAtividade) => {
+    const { error } = await supabase
+      .from("atividades")
+      .update({ ativo: !a.ativo })
+      .eq("id", a.id);
+    if (error) toast.error(error.message);
+    else setAtividades((prev) => prev.map((i) => (i.id === a.id ? { ...i, ativo: !a.ativo } : i)));
+  };
+
+  const removeAtividade = async (a: DbAtividade) => {
+    if (!confirm(`Excluir "${a.titulo}"?`)) return;
+    const { error } = await supabase.from("atividades").delete().eq("id", a.id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Excluído");
+      setAtividades((prev) => prev.filter((i) => i.id !== a.id));
+    }
+  };
+
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/60 bg-card/40 backdrop-blur">
