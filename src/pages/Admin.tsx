@@ -91,6 +91,7 @@ const Admin = () => {
   const [atvOpen, setAtvOpen] = useState(false);
   const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
   const [atvSaving, setAtvSaving] = useState(false);
+  const [section, setSection] = useState<"produtos" | "atividades" | "usuarios">("produtos");
 
   const importFromHotmart = async () => {
     const url = form.link_hotmart.trim();
