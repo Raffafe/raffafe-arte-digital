@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -92,6 +92,43 @@ const Admin = () => {
   const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
   const [atvSaving, setAtvSaving] = useState(false);
   const [atvImporting, setAtvImporting] = useState(false);
+  const [atvUploading, setAtvUploading] = useState(false);
+  const atvFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAtvFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Formato inválido. Use JPG, PNG ou WEBP.");
+      return;
+    }
+    const MAX = 5 * 1024 * 1024;
+    if (file.size > MAX) {
+      toast.error("Imagem muito grande. Máximo 5 MB.");
+      return;
+    }
+    setAtvUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `capas/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("atividades")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (upErr) {
+        toast.error(`Falha no upload: ${upErr.message}`);
+        return;
+      }
+      const { data } = supabase.storage.from("atividades").getPublicUrl(path);
+      setAtvForm((f) => ({ ...f, imagem_url: data.publicUrl }));
+      toast.success("Imagem enviada");
+    } catch (err) {
+      toast.error(`Erro inesperado: ${String(err)}`);
+    } finally {
+      setAtvUploading(false);
+    }
+  };
 
   const importAtividadeCover = async () => {
     const url = atvForm.video_url.trim();
@@ -707,12 +744,40 @@ const Admin = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label>Imagem de capa (URL)</Label>
-              <Input
-                value={atvForm.imagem_url}
-                onChange={(e) => setAtvForm({ ...atvForm, imagem_url: e.target.value })}
-                placeholder="https://..."
-              />
+              <Label>Imagem de capa</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={atvForm.imagem_url}
+                  onChange={(e) => setAtvForm({ ...atvForm, imagem_url: e.target.value })}
+                  placeholder="URL da imagem ou envie um arquivo"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => atvFileInputRef.current?.click()}
+                  disabled={atvUploading}
+                  className="shrink-0"
+                >
+                  {atvUploading ? "Enviando..." : "Enviar imagem de capa"}
+                </Button>
+                <input
+                  ref={atvFileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAtvFileUpload}
+                />
+              </div>
+              {atvForm.imagem_url && (
+                <img
+                  src={atvForm.imagem_url}
+                  alt="Pré-visualização"
+                  className="mt-2 max-h-32 rounded border border-border object-cover"
+                />
+              )}
+              <p className="text-xs text-muted-foreground">
+                Formatos: JPG, PNG, WEBP. Tamanho máximo: 5 MB.
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Link do vídeo ou post</Label>
