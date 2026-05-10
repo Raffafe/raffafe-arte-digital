@@ -92,6 +92,43 @@ const Admin = () => {
   const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
   const [atvSaving, setAtvSaving] = useState(false);
   const [atvImporting, setAtvImporting] = useState(false);
+  const [atvUploading, setAtvUploading] = useState(false);
+  const atvFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAtvFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      toast.error("Formato inválido. Use JPG, PNG ou WEBP.");
+      return;
+    }
+    const MAX = 5 * 1024 * 1024;
+    if (file.size > MAX) {
+      toast.error("Imagem muito grande. Máximo 5 MB.");
+      return;
+    }
+    setAtvUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `capas/${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("atividades")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (upErr) {
+        toast.error(`Falha no upload: ${upErr.message}`);
+        return;
+      }
+      const { data } = supabase.storage.from("atividades").getPublicUrl(path);
+      setAtvForm((f) => ({ ...f, imagem_url: data.publicUrl }));
+      toast.success("Imagem enviada");
+    } catch (err) {
+      toast.error(`Erro inesperado: ${String(err)}`);
+    } finally {
+      setAtvUploading(false);
+    }
+  };
 
   const importAtividadeCover = async () => {
     const url = atvForm.video_url.trim();
