@@ -490,6 +490,7 @@ const Admin = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-16">Ordem</TableHead>
                       <TableHead>Título</TableHead>
                       <TableHead>Categoria</TableHead>
                       <TableHead>Mês</TableHead>
@@ -501,6 +502,7 @@ const Admin = () => {
                   <TableBody>
                     {items.map((p) => (
                       <TableRow key={p.id}>
+                        <TableCell className="text-muted-foreground tabular-nums">{p.ordem ?? 0}</TableCell>
                         <TableCell className="font-medium">{p.titulo}</TableCell>
                         <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
                         <TableCell>{MONTHS[p.mes - 1]}</TableCell>
