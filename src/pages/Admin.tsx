@@ -91,6 +91,40 @@ const Admin = () => {
   const [atvOpen, setAtvOpen] = useState(false);
   const [atvForm, setAtvForm] = useState<AtividadeForm>(emptyAtividade);
   const [atvSaving, setAtvSaving] = useState(false);
+  const [atvImporting, setAtvImporting] = useState(false);
+
+  const importAtividadeCover = async () => {
+    const url = atvForm.video_url.trim();
+    if (!url || !/^https?:\/\//.test(url)) {
+      toast.error("Cole um link válido no campo de vídeo/post primeiro");
+      return;
+    }
+    setAtvImporting(true);
+    try {
+      const ytId = getYouTubeId(url);
+      if (ytId) {
+        const thumb = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        setAtvForm((f) => ({ ...f, imagem_url: thumb }));
+        toast.success("Capa do YouTube importada");
+        return;
+      }
+      const { data, error } = await supabase.functions.invoke("import-hotmart", { body: { url } });
+      if (error) {
+        toast.error("Não foi possível importar a capa automaticamente. Cole uma imagem manualmente.");
+        return;
+      }
+      if (data?.image) {
+        setAtvForm((f) => ({ ...f, imagem_url: data.image }));
+        toast.success("Capa importada");
+      } else {
+        toast.error("Não foi possível importar a capa automaticamente. Cole uma imagem manualmente.");
+      }
+    } catch {
+      toast.error("Não foi possível importar a capa automaticamente. Cole uma imagem manualmente.");
+    } finally {
+      setAtvImporting(false);
+    }
+  };
   const [section, setSection] = useState<"produtos" | "atividades" | "usuarios">("produtos");
 
   const importFromHotmart = async () => {
