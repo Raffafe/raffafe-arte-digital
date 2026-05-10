@@ -274,6 +274,7 @@ const Admin = () => {
       imagem_url: form.imagem_url || null,
       link_hotmart: form.link_hotmart || null,
       ativo: form.ativo,
+      ordem: form.ordem.trim() === "" ? 0 : Number(form.ordem) || 0,
     };
     const { error } = form.id
       ? await supabase.from("produtos").update(payload).eq("id", form.id)
