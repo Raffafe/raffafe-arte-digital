@@ -31,7 +31,7 @@ import {
 import { toast } from "sonner";
 import { CATEGORIES, MONTHS } from "@/data/products";
 import type { AdminUser, DbProduct } from "@/hooks/useProducts";
-import type { DbAtividade } from "@/hooks/useAtividades";
+import { getYouTubeId, type DbAtividade } from "@/hooks/useAtividades";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 
