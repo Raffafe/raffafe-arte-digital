@@ -46,6 +46,7 @@ interface FormState {
   imagem_url: string;
   link_hotmart: string;
   ativo: boolean;
+  ordem: string;
 }
 
 const empty: FormState = {
@@ -58,6 +59,7 @@ const empty: FormState = {
   imagem_url: "",
   link_hotmart: "",
   ativo: true,
+  ordem: "",
 };
 
 interface AtividadeForm {
@@ -214,7 +216,7 @@ const Admin = () => {
   const load = async () => {
     setLoading(true);
     const [productsResult, usersResult, atividadesResult] = await Promise.all([
-      supabase.from("produtos").select("*").order("created_at", { ascending: false }),
+      supabase.from("produtos").select("*").order("mes", { ascending: true }).order("ordem", { ascending: true }).order("created_at", { ascending: true }),
       supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
       supabase.from("atividades").select("*").order("created_at", { ascending: false }),
     ]);
@@ -251,6 +253,7 @@ const Admin = () => {
       imagem_url: p.imagem_url ?? "",
       link_hotmart: p.link_hotmart ?? "",
       ativo: p.ativo,
+      ordem: p.ordem != null ? String(p.ordem) : "",
     });
     setOpen(true);
   };
@@ -271,6 +274,7 @@ const Admin = () => {
       imagem_url: form.imagem_url || null,
       link_hotmart: form.link_hotmart || null,
       ativo: form.ativo,
+      ordem: form.ordem.trim() === "" ? 0 : Number(form.ordem) || 0,
     };
     const { error } = form.id
       ? await supabase.from("produtos").update(payload).eq("id", form.id)
@@ -486,6 +490,7 @@ const Admin = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-16">Ordem</TableHead>
                       <TableHead>Título</TableHead>
                       <TableHead>Categoria</TableHead>
                       <TableHead>Mês</TableHead>
@@ -497,6 +502,7 @@ const Admin = () => {
                   <TableBody>
                     {items.map((p) => (
                       <TableRow key={p.id}>
+                        <TableCell className="text-muted-foreground tabular-nums">{p.ordem ?? 0}</TableCell>
                         <TableCell className="font-medium">{p.titulo}</TableCell>
                         <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
                         <TableCell>{MONTHS[p.mes - 1]}</TableCell>
@@ -711,6 +717,19 @@ const Admin = () => {
               </div>
               <p className="text-xs text-muted-foreground">
                 Cole o link e clique em "Importar dados" para preencher título, imagem e preço automaticamente. Tudo permanece editável.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>Ordem de exibição</Label>
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={form.ordem}
+                onChange={(e) => setForm({ ...form, ordem: e.target.value })}
+                placeholder="Ex.: 1, 2, 3..."
+              />
+              <p className="text-xs text-muted-foreground">
+                Menor número aparece primeiro dentro do mesmo mês. Deixe vazio para usar a data de criação.
               </p>
             </div>
             <div className="flex items-center gap-3 pt-2">
