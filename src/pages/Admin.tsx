@@ -719,6 +719,19 @@ const Admin = () => {
                 Cole o link e clique em "Importar dados" para preencher título, imagem e preço automaticamente. Tudo permanece editável.
               </p>
             </div>
+            <div className="space-y-2">
+              <Label>Ordem de exibição</Label>
+              <Input
+                type="number"
+                inputMode="numeric"
+                value={form.ordem}
+                onChange={(e) => setForm({ ...form, ordem: e.target.value })}
+                placeholder="Ex.: 1, 2, 3..."
+              />
+              <p className="text-xs text-muted-foreground">
+                Menor número aparece primeiro dentro do mesmo mês. Deixe vazio para usar a data de criação.
+              </p>
+            </div>
             <div className="flex items-center gap-3 pt-2">
               <Switch checked={form.ativo} onCheckedChange={(v) => setForm({ ...form, ativo: v })} />
               <Label>Produto ativo (aparece na loja)</Label>
