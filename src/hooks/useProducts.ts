@@ -13,6 +13,7 @@ export interface DbProduct {
   imagem_url: string | null;
   link_hotmart: string | null;
   ativo: boolean;
+  ordem: number;
   created_at: string;
 }
 
