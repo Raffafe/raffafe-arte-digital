@@ -716,11 +716,22 @@ const Admin = () => {
             </div>
             <div className="space-y-2">
               <Label>Link do vídeo ou post</Label>
-              <Input
-                value={atvForm.video_url}
-                onChange={(e) => setAtvForm({ ...atvForm, video_url: e.target.value })}
-                placeholder="YouTube, Instagram ou Pinterest"
-              />
+              <div className="flex gap-2">
+                <Input
+                  value={atvForm.video_url}
+                  onChange={(e) => setAtvForm({ ...atvForm, video_url: e.target.value })}
+                  placeholder="YouTube, Instagram ou Pinterest"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={importAtividadeCover}
+                  disabled={atvImporting}
+                  className="shrink-0"
+                >
+                  {atvImporting ? "Importando..." : "Importar capa automaticamente"}
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground">
                 YouTube é incorporado como vídeo. Instagram/Pinterest aparecem como link externo.
               </p>
