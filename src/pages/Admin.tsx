@@ -720,16 +720,16 @@ const Admin = () => {
               </p>
             </div>
             <div className="space-y-2">
-              <Label>Ordem de exibição</Label>
+              <Label>Ordem de destaque (opcional)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
-                value={form.ordem}
-                onChange={(e) => setForm({ ...form, ordem: e.target.value })}
-                placeholder="Ex.: 1, 2, 3..."
+                value={form.destaque_ordem}
+                onChange={(e) => setForm({ ...form, destaque_ordem: e.target.value })}
+                placeholder="Ex.: 10, 20, 100..."
               />
               <p className="text-xs text-muted-foreground">
-                Menor número aparece primeiro dentro do mesmo mês. Deixe vazio para usar a data de criação.
+                Deixe vazio para usar a ordem automática por data. Use números maiores para colocar este produto mais acima.
               </p>
             </div>
             <div className="flex items-center gap-3 pt-2">
