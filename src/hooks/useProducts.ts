@@ -14,6 +14,7 @@ export interface DbProduct {
   link_hotmart: string | null;
   ativo: boolean;
   ordem: number;
+  destaque_ordem: number | null;
   created_at: string;
 }
 
