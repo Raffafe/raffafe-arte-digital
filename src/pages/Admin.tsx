@@ -216,7 +216,7 @@ const Admin = () => {
   const load = async () => {
     setLoading(true);
     const [productsResult, usersResult, atividadesResult] = await Promise.all([
-      supabase.from("produtos").select("*").order("mes", { ascending: true }).order("ordem", { ascending: true }).order("created_at", { ascending: true }),
+      supabase.from("produtos").select("*").order("destaque_ordem", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
       supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
       supabase.from("atividades").select("*").order("created_at", { ascending: false }),
     ]);
