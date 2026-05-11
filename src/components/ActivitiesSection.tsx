@@ -30,16 +30,20 @@ export const ActivitiesSection = ({ onGoToShop }: Props) => {
       ) : atividades.length === 0 ? (
         <div className="py-10 text-center text-muted-foreground">Nenhuma atividade publicada ainda.</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {atividades.map((a) => {
             const ytId = getYouTubeId(a.video_url);
-            const externalLink = !ytId && a.video_url && isExternalSocial(a.video_url) ? a.video_url : null;
+            const actionLink = ytId
+              ? `https://www.youtube.com/watch?v=${ytId}`
+              : a.video_url && isExternalSocial(a.video_url)
+              ? a.video_url
+              : a.video_url || null;
             return (
               <Card
                 key={a.id}
-                className="overflow-hidden bg-card-gradient border-border/60 shadow-card-soft rounded-2xl"
+                className="flex flex-col overflow-hidden bg-card-gradient border-border/60 shadow-card-soft rounded-2xl transition-smooth hover:shadow-soft"
               >
-                <div className="aspect-video bg-muted">
+                <div className="relative w-full overflow-hidden bg-muted h-[220px] md:h-[260px]">
                   {ytId ? (
                     <iframe
                       loading="lazy"
@@ -47,32 +51,38 @@ export const ActivitiesSection = ({ onGoToShop }: Props) => {
                       title={a.titulo}
                       allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
-                      className="h-full w-full border-0"
+                      className="absolute inset-0 h-full w-full border-0"
                     />
                   ) : a.imagem_url ? (
                     <img
                       src={a.imagem_url}
                       alt={a.titulo}
                       loading="lazy"
-                      className="h-full w-full object-cover"
+                      className="absolute inset-0 h-full w-full object-cover"
                     />
                   ) : null}
                 </div>
-                <div className="p-5 space-y-2">
-                  <h3 className="font-display text-lg text-foreground">{a.titulo}</h3>
+                <div className="flex flex-1 flex-col p-6 gap-3">
+                  <h3 className="font-display text-lg text-foreground line-clamp-2">{a.titulo}</h3>
                   {a.texto_curto && (
-                    <p className="text-sm text-muted-foreground leading-relaxed">{a.texto_curto}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                      {a.texto_curto}
+                    </p>
                   )}
-                  {externalLink && (
-                    <a
-                      href={externalLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline pt-1"
-                    >
-                      Ver no link original
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
+                  {actionLink && (
+                    <div className="mt-auto pt-4">
+                      <Button
+                        asChild
+                        size="sm"
+                        variant="secondary"
+                        className="rounded-full bg-accent text-accent-foreground hover:bg-accent/80 px-5"
+                      >
+                        <a href={actionLink} target="_blank" rel="noopener noreferrer">
+                          Ver atividade
+                          <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                        </a>
+                      </Button>
+                    </div>
                   )}
                 </div>
               </Card>
