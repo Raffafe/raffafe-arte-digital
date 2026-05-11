@@ -52,9 +52,8 @@ export const useActiveProducts = () => {
         .from("produtos")
         .select("*")
         .eq("ativo", true)
-        .order("mes", { ascending: true })
-        .order("ordem", { ascending: true })
-        .order("created_at", { ascending: true });
+        .order("destaque_ordem", { ascending: false, nullsFirst: false })
+        .order("created_at", { ascending: false });
       if (!mounted) return;
       if (!error && data) setProducts((data as DbProduct[]).map(dbToProduct));
       setLoading(false);
