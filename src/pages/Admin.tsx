@@ -253,7 +253,7 @@ const Admin = () => {
       imagem_url: p.imagem_url ?? "",
       link_hotmart: p.link_hotmart ?? "",
       ativo: p.ativo,
-      ordem: p.ordem != null ? String(p.ordem) : "",
+      destaque_ordem: p.destaque_ordem != null ? String(p.destaque_ordem) : "",
     });
     setOpen(true);
   };
