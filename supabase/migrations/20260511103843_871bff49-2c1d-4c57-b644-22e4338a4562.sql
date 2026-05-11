@@ -1,0 +1,2 @@
+ALTER TABLE public.produtos ADD COLUMN IF NOT EXISTS destaque_ordem integer;
+CREATE INDEX IF NOT EXISTS idx_produtos_destaque_created ON public.produtos (destaque_ordem DESC NULLS LAST, created_at DESC);
