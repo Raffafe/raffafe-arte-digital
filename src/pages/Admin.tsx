@@ -46,7 +46,7 @@ interface FormState {
   imagem_url: string;
   link_hotmart: string;
   ativo: boolean;
-  ordem: string;
+  destaque_ordem: string;
 }
 
 const empty: FormState = {
@@ -59,7 +59,7 @@ const empty: FormState = {
   imagem_url: "",
   link_hotmart: "",
   ativo: true,
-  ordem: "",
+  destaque_ordem: "",
 };
 
 interface AtividadeForm {
@@ -216,7 +216,7 @@ const Admin = () => {
   const load = async () => {
     setLoading(true);
     const [productsResult, usersResult, atividadesResult] = await Promise.all([
-      supabase.from("produtos").select("*").order("mes", { ascending: true }).order("ordem", { ascending: true }).order("created_at", { ascending: true }),
+      supabase.from("produtos").select("*").order("destaque_ordem", { ascending: false, nullsFirst: false }).order("created_at", { ascending: false }),
       supabase.from("admin_users").select("*").order("created_at", { ascending: false }),
       supabase.from("atividades").select("*").order("created_at", { ascending: false }),
     ]);
@@ -253,7 +253,7 @@ const Admin = () => {
       imagem_url: p.imagem_url ?? "",
       link_hotmart: p.link_hotmart ?? "",
       ativo: p.ativo,
-      ordem: p.ordem != null ? String(p.ordem) : "",
+      destaque_ordem: p.destaque_ordem != null ? String(p.destaque_ordem) : "",
     });
     setOpen(true);
   };
@@ -274,7 +274,7 @@ const Admin = () => {
       imagem_url: form.imagem_url || null,
       link_hotmart: form.link_hotmart || null,
       ativo: form.ativo,
-      ordem: form.ordem.trim() === "" ? 0 : Number(form.ordem) || 0,
+      destaque_ordem: form.destaque_ordem.trim() === "" ? null : (Number(form.destaque_ordem) || null),
     };
     const { error } = form.id
       ? await supabase.from("produtos").update(payload).eq("id", form.id)
@@ -490,7 +490,7 @@ const Admin = () => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-16">Ordem</TableHead>
+                      <TableHead className="w-20">Destaque</TableHead>
                       <TableHead>Título</TableHead>
                       <TableHead>Categoria</TableHead>
                       <TableHead>Mês</TableHead>
@@ -502,7 +502,7 @@ const Admin = () => {
                   <TableBody>
                     {items.map((p) => (
                       <TableRow key={p.id}>
-                        <TableCell className="text-muted-foreground tabular-nums">{p.ordem ?? 0}</TableCell>
+                        <TableCell className="text-muted-foreground tabular-nums">{p.destaque_ordem ?? "—"}</TableCell>
                         <TableCell className="font-medium">{p.titulo}</TableCell>
                         <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
                         <TableCell>{MONTHS[p.mes - 1]}</TableCell>
@@ -720,16 +720,16 @@ const Admin = () => {
               </p>
             </div>
             <div className="space-y-2">
-              <Label>Ordem de exibição</Label>
+              <Label>Ordem de destaque (opcional)</Label>
               <Input
                 type="number"
                 inputMode="numeric"
-                value={form.ordem}
-                onChange={(e) => setForm({ ...form, ordem: e.target.value })}
-                placeholder="Ex.: 1, 2, 3..."
+                value={form.destaque_ordem}
+                onChange={(e) => setForm({ ...form, destaque_ordem: e.target.value })}
+                placeholder="Ex.: 10, 20, 100..."
               />
               <p className="text-xs text-muted-foreground">
-                Menor número aparece primeiro dentro do mesmo mês. Deixe vazio para usar a data de criação.
+                Deixe vazio para usar a ordem automática por data. Use números maiores para colocar este produto mais acima.
               </p>
             </div>
             <div className="flex items-center gap-3 pt-2">

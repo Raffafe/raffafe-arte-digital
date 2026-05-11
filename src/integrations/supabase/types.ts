@@ -82,6 +82,7 @@ export type Database = {
           ativo: boolean
           categoria: string
           created_at: string
+          destaque_ordem: number | null
           id: string
           imagem_url: string | null
           link_hotmart: string | null
@@ -96,6 +97,7 @@ export type Database = {
           ativo?: boolean
           categoria: string
           created_at?: string
+          destaque_ordem?: number | null
           id?: string
           imagem_url?: string | null
           link_hotmart?: string | null
@@ -110,6 +112,7 @@ export type Database = {
           ativo?: boolean
           categoria?: string
           created_at?: string
+          destaque_ordem?: number | null
           id?: string
           imagem_url?: string | null
           link_hotmart?: string | null
