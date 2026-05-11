@@ -46,7 +46,7 @@ interface FormState {
   imagem_url: string;
   link_hotmart: string;
   ativo: boolean;
-  ordem: string;
+  destaque_ordem: string;
 }
 
 const empty: FormState = {
@@ -59,7 +59,7 @@ const empty: FormState = {
   imagem_url: "",
   link_hotmart: "",
   ativo: true,
-  ordem: "",
+  destaque_ordem: "",
 };
 
 interface AtividadeForm {
