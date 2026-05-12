@@ -97,15 +97,19 @@ export const ActivitiesSection = ({ onGoToShop }: Props) => {
         </h3>
         <p className="mt-2 text-foreground/70 max-w-xl mx-auto">
           Encontre atividades prontas para imprimir, organizadas por mês e por tema.
-        </p>
+        </p> 
+        
         <Button
           onClick={onGoToShop}
           size="lg"
-          className="mt-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+          className="mt-6 mx-auto flex w-full max-w-[320px] items-center justify-center rounded-full bg-primary px-5 text-center text-sm leading-tight text-primary-foreground hover:bg-primary/90 sm:w-auto sm:max-w-none sm:text-base"
         >
+          <span className="whitespace-normal">
           Ver materiais prontos para imprimir
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Button>
+          </span>
+          <ArrowRight className="ml-2 h-4 w-4 shrink-0" />
+       </Button> 
+        
       </div>
     </section>
   );
