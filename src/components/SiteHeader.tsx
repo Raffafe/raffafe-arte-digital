@@ -17,9 +17,9 @@ export const SiteHeader = ({ search, onSearchChange }: SiteHeaderProps) => {
         <p className="mt-3 text-base md:text-lg text-muted-foreground font-body">
           Arte e Educação Criativa
         </p>
-        <p className="mt-2 max-w-xl mx-auto text-sm md:text-base text-foreground/70">
-          Materiais artísticos e didáticos para tornar suas aulas mais leves o ano todo.
-        </p>
+       <p className="mt-2 max-w-xl mx-auto text-sm md:text-base text-foreground/70">
+          Atividades artísticas e materiais prontos para imprimir para professoras da educação infantil e primeiro ciclo.
+       </p>
 
         <div className="relative mt-8 max-w-md mx-auto">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
