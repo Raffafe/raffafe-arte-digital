@@ -90,9 +90,16 @@ interface IndexProps {
             )}
           </TabsContent>
 
-          <TabsContent value="atividades" className="mt-8">
-            <ActivitiesSection onGoToShop={() => window.location.href = "/loja"} />
-          </TabsContent>
+         <TabsContent value="atividades" className="mt-8">
+         <ActivitiesSection
+         onGoToShop={() => {
+         window.location.href = "/loja";
+         setTimeout(() => {
+         window.scrollTo({ top: 0, behavior: "smooth" });
+         }, 100);
+         }}
+         />
+         </TabsContent>
         </Tabs>
       </main>
 
