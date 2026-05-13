@@ -19,7 +19,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Index initialTab="loja" />} />
+          <Route path="/loja" element={<Index initialTab="loja" />} />
+          <Route path="/atividades" element={<Index initialTab="atividades" />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/admin" element={<ProtectedAdmin><Admin /></ProtectedAdmin>} />
