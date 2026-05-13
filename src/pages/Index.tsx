@@ -91,7 +91,7 @@ interface IndexProps {
           </TabsContent>
 
           <TabsContent value="atividades" className="mt-8">
-            <ActivitiesSection onGoToShop={() => setTab("loja")} />
+            <ActivitiesSection onGoToShop={() => window.location.href = "/loja"} />
           </TabsContent>
         </Tabs>
       </main>
