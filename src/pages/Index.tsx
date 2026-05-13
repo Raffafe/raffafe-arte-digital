@@ -7,16 +7,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MONTHS, type Category } from "@/data/products";
 import { useActiveProducts } from "@/hooks/useProducts";
 
-const Index = () => {
+interface IndexProps {
+  initialTab?: "loja" | "atividades";
+}
+
+  const Index = ({ initialTab = "loja" }: IndexProps) => {
   const { products } = useActiveProducts();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
   const [month, setMonth] = useState<number | "all">("all");
-  const [tab, setTab] = useState(() =>
-    typeof window !== "undefined" && window.location.hash.replace("#", "") === "atividades"
-      ? "atividades"
-      : "loja",
-  );
+  const [tab, setTab] = useState<"loja" | "atividades">(initialTab);
 
   const now = new Date();
   const currentMonth = now.getMonth() + 1; // 1-12
