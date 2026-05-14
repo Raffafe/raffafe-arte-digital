@@ -3,6 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { ProductSection } from "@/components/ProductSection";
 import { ProductFilters } from "@/components/ProductFilters";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
+import { ContactCard } from "@/components/ContactCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { MONTHS, type Category } from "@/data/products";
 import { useActiveProducts } from "@/hooks/useProducts";
@@ -102,7 +103,9 @@ interface IndexProps {
          </TabsContent>
         </Tabs>
       </main>
-
+      
+      <ContactCard />
+      
       <footer className="border-t border-border/60 bg-card/40 backdrop-blur">
         <div className="container mx-auto px-4 py-8 text-center text-sm text-muted-foreground">
           Feito com carinho • Raffafe.arte © {new Date().getFullYear()}
