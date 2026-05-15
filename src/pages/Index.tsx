@@ -1,23 +1,47 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ProductSection } from "@/components/ProductSection";
 import { ProductFilters } from "@/components/ProductFilters";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { ContactCard } from "@/components/ContactCard";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { MONTHS, type Category } from "@/data/products";
+import { MONTHS, CATEGORIES, type Category } from "@/data/products";
 import { useActiveProducts } from "@/hooks/useProducts";
+import { useParams } from "react-router-dom";
 
 interface IndexProps {
   initialTab?: "loja" | "atividades";
 }
 
-  const Index = ({ initialTab = "loja" }: IndexProps) => {
+const Index = ({ initialTab = "loja" }: IndexProps) => {
   const { products } = useActiveProducts();
+  const { categoria } = useParams();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
   const [month, setMonth] = useState<number | "all">("all");
   const [tab, setTab] = useState<"loja" | "atividades">(initialTab);
+
+    useEffect(() => {
+  if (!categoria) return;
+
+  const categoryMap: Record<string, Category> = {
+    "volta-as-aulas": "Volta às Aulas",
+    "kits-para-sala": "Kits para Sala",
+    "leitura-aconchego": "Leitura & Aconchego",
+    "yoga-bem-estar": "Yoga & Bem-estar",
+    "arte-que-acolhe": "Arte que Acolhe",
+    "livros": "Livros",
+    "datas-comemorativas": "Datas Comemorativas",
+    "conscientizacao-cuidado": "Conscientização & Cuidado",
+    "jogos": "Jogos",
+  };
+
+  const mappedCategory = categoryMap[categoria];
+
+  if (mappedCategory && CATEGORIES.includes(mappedCategory)) {
+    setCategory(mappedCategory);
+  }
+}, [categoria]);
 
   const now = new Date();
   const currentMonth = now.getMonth() + 1; // 1-12
