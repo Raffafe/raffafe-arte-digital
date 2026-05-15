@@ -6,6 +6,8 @@ export type Category =
   | "Kits para Sala"
   | "Criações Artísticas"
   | "Arte que Acolhe"
+  | "Leitura & Aconchego"
+  | "Yoga & Bem-estar"
   | "Livros";
 
 export interface Product {
@@ -26,8 +28,9 @@ export const CATEGORIES: Category[] = [
   "Volta às Aulas",
   "Jogos",
   "Kits para Sala",
-  "Criações Artísticas",
   "Arte que Acolhe",
+  "Leitura & Aconchego",
+  "Yoga & Bem-estar",
   "Livros",
 ];
 
