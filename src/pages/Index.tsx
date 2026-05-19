@@ -60,6 +60,16 @@ const mappedMonth = monthMap[categoria];
 
 if (mappedMonth) {
   setMonth(mappedMonth);
+} 
+      const searchMap: Record<string, string> = {
+  "copa-do-mundo": "Copa do Mundo",
+  "festa-junina": "Festa Junina",
+};
+
+const mappedSearch = searchMap[categoria];
+
+if (mappedSearch) {
+  setSearch(mappedSearch);
 }
 }, [categoria]);
 
