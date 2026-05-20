@@ -40,7 +40,7 @@ interface FormState {
   titulo: string;
   preco: string;
   categoria: string;
-  mes: number;
+  mes: number | null;
   tema: string;
   publico: string;
   imagem_url: string;
@@ -53,7 +53,7 @@ const empty: FormState = {
   titulo: "",
   preco: "",
   categoria: CATEGORIES[0],
-  mes: 1,
+  mes: null,
   tema: "",
   publico: "",
   imagem_url: "",
@@ -268,7 +268,7 @@ const Admin = () => {
       titulo: form.titulo.trim(),
       preco: Number(form.preco.replace(",", ".")) || 0,
       categoria: form.categoria,
-      mes: Number(form.mes),
+      mes: form.mes,
       tema: form.tema || null,
       publico: form.publico || null,
       imagem_url: form.imagem_url || null,
@@ -505,7 +505,9 @@ const Admin = () => {
                         <TableCell className="text-muted-foreground tabular-nums">{p.destaque_ordem ?? "—"}</TableCell>
                         <TableCell className="font-medium">{p.titulo}</TableCell>
                         <TableCell className="text-muted-foreground">{p.categoria}</TableCell>
-                        <TableCell>{MONTHS[p.mes - 1]}</TableCell>
+                        <TableCell>
+                        {p.mes ? MONTHS[p.mes - 1] : "—"}
+                        </TableCell>
                         <TableCell>R$ {Number(p.preco).toFixed(2)}</TableCell>
                         <TableCell>
                           <Switch checked={p.ativo} onCheckedChange={() => toggleActive(p)} />
@@ -663,14 +665,23 @@ const Admin = () => {
               </div>
               <div className="space-y-2">
                 <Label>Mês</Label>
-                <Select value={String(form.mes)} onValueChange={(v) => setForm({ ...form, mes: Number(v) })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {MONTHS.map((m, i) => (
-                      <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Select
+  value={form.mes ? String(form.mes) : "sem-mes"}
+  onValueChange={(v) =>
+    setForm({
+      ...form,
+      mes: v === "sem-mes" ? null : Number(v),
+    })
+  }
+>
+  <SelectTrigger><SelectValue /></SelectTrigger>
+  <SelectContent>
+    <SelectItem value="sem-mes">Sem mês específico</SelectItem>
+    {MONTHS.map((m, i) => (
+      <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>
+    ))}
+  </SelectContent>
+</Select>
               </div>
             </div>
             <div className="space-y-2">
