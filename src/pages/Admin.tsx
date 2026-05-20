@@ -40,7 +40,7 @@ interface FormState {
   titulo: string;
   preco: string;
   categoria: string;
-  mes: number | null;
+  mes: number;
   tema: string;
   publico: string;
   imagem_url: string;
@@ -53,7 +53,7 @@ const empty: FormState = {
   titulo: "",
   preco: "",
   categoria: CATEGORIES[0],
-  mes: null,
+  mes: 0,
   tema: "",
   publico: "",
   imagem_url: "",
@@ -247,7 +247,7 @@ const Admin = () => {
       titulo: p.titulo,
       preco: String(p.preco),
       categoria: p.categoria,
-      mes: p.mes,
+      mes: Number(form.mes),
       tema: p.tema ?? "",
       publico: p.publico ?? "",
       imagem_url: p.imagem_url ?? "",
@@ -666,7 +666,25 @@ const Admin = () => {
               <div className="space-y-2">
                 <Label>Mês</Label>
                 <Select
-  value={form.mes ? String(form.mes) : "sem-mes"}
+  value={String(form.mes)}
+  onValueChange={(v) => setForm({ ...form, mes: Number(v) })}
+>
+  <SelectTrigger><SelectValue /></SelectTrigger>
+
+  <SelectContent>
+
+    <SelectItem value="0">
+      Sem mês específico
+    </SelectItem>
+
+    {MONTHS.map((m, i) => (
+      <SelectItem key={m} value={String(i + 1)}>
+        {m}
+      </SelectItem>
+    ))}
+
+  </SelectContent>
+</Select>
   onValueChange={(v) =>
     setForm({
       ...form,
