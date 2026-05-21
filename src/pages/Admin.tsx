@@ -247,7 +247,7 @@ const Admin = () => {
       titulo: p.titulo,
       preco: String(p.preco),
       categoria: p.categoria,
-      mes: Number(form.mes),
+      mes: p.mes ?? 0,
       tema: p.tema ?? "",
       publico: p.publico ?? "",
       imagem_url: p.imagem_url ?? "",
@@ -665,38 +665,22 @@ const Admin = () => {
               </div>
               <div className="space-y-2">
                 <Label>Mês</Label>
-                <Select
-  value={String(form.mes)}
-  onValueChange={(v) => setForm({ ...form, mes: Number(v) })}
->
-  <SelectTrigger><SelectValue /></SelectTrigger>
+               
+              <Select
+                value={String(form.mes)}
+                onValueChange={(v) => setForm({ ...form, mes: Number(v) })}
+                >
+              <SelectTrigger>
+              <SelectValue />
+              </SelectTrigger>
 
-  <SelectContent>
-
-    <SelectItem value="0">
-      Sem mês específico
-    </SelectItem>
+      <SelectContent>
+    <SelectItem value="0">Sem mês específico</SelectItem>
 
     {MONTHS.map((m, i) => (
       <SelectItem key={m} value={String(i + 1)}>
         {m}
       </SelectItem>
-    ))}
-
-  </SelectContent>
-</Select>
-  onValueChange={(v) =>
-    setForm({
-      ...form,
-      mes: v === "sem-mes" ? null : Number(v),
-    })
-  }
->
-  <SelectTrigger><SelectValue /></SelectTrigger>
-  <SelectContent>
-    <SelectItem value="sem-mes">Sem mês específico</SelectItem>
-    {MONTHS.map((m, i) => (
-      <SelectItem key={m} value={String(i + 1)}>{m}</SelectItem>
     ))}
   </SelectContent>
 </Select>
