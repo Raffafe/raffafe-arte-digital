@@ -95,6 +95,8 @@ if (mappedSearch) {
 
   const currentMonthProducts = filtered.filter((p) => p.month === currentMonth);
   const nextMonthProducts = filtered.filter((p) => p.month === nextMonth);
+  const noMonthProducts = filtered.filter((p) => p.month == null);
+
 
   return (
     <div className="min-h-screen flex flex-col">
