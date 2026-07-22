@@ -86,7 +86,7 @@ export type Database = {
           id: string
           imagem_url: string | null
           link_hotmart: string | null
-          mes: number
+          mes: number | null
           ordem: number
           preco: number
           publico: string | null
@@ -101,7 +101,7 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           link_hotmart?: string | null
-          mes: number
+          mes?: number | null
           ordem?: number
           preco?: number
           publico?: string | null
@@ -116,7 +116,7 @@ export type Database = {
           id?: string
           imagem_url?: string | null
           link_hotmart?: string | null
-          mes?: number
+          mes?: number | null
           ordem?: number
           preco?: number
           publico?: string | null
