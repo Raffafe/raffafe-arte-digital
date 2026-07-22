@@ -248,7 +248,7 @@ const Admin = () => {
       titulo: p.titulo,
       preco: String(p.preco),
       categoria: p.categoria,
-      mes: p.mes ?? 0,
+      mes: p.mes ?? null,
       tema: p.tema ?? "",
       publico: p.publico ?? "",
       imagem_url: p.imagem_url ?? "",
