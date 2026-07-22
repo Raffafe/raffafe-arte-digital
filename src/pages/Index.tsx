@@ -101,7 +101,7 @@ if (mappedSearch) {
       <SiteHeader search={search} onSearchChange={setSearch} />
 
       <main className="container mx-auto px-4 pb-16 flex-1">
-        <Tabs value={tab} onValueChange={setTab} className="mt-2">
+        <Tabs value={tab} onValueChange={(v) => setTab(v as "loja" | "atividades")} className="mt-2">
           <TabsList className="mx-auto flex w-fit rounded-full bg-card/70 backdrop-blur border border-border/60 p-1 shadow-card-soft">
             <TabsTrigger value="loja" className="rounded-full px-6 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
               Loja
