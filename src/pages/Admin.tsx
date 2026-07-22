@@ -277,6 +277,7 @@ const Admin = () => {
       ativo: form.ativo,
       destaque_ordem: form.destaque_ordem.trim() === "" ? null : (Number(form.destaque_ordem) || null),
     };
+
     const { error } = form.id
       ? await supabase.from("produtos").update(payload).eq("id", form.id)
       : await supabase.from("produtos").insert(payload);
