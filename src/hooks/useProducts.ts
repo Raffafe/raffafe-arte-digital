@@ -7,7 +7,7 @@ export interface DbProduct {
   titulo: string;
   preco: number;
   categoria: string;
-  mes: number;
+  mes: number | null;
   tema: string | null;
   publico: string | null;
   imagem_url: string | null;
@@ -34,12 +34,13 @@ export const dbToProduct = (p: DbProduct): Product => ({
   title: p.titulo,
   price: Number(p.preco) || 0,
   category: p.categoria as Product["category"],
-  month: p.mes,
+  month: p.mes ?? null,
   theme: p.tema ?? "",
   audience: p.publico ?? "",
   image: p.imagem_url ?? "/placeholder.svg",
   hotmartUrl: p.link_hotmart ?? "#",
 });
+
 
 export const useActiveProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
