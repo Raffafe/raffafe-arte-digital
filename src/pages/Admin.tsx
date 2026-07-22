@@ -669,15 +669,15 @@ const Admin = () => {
                 <Label>Mês</Label>
                
               <Select
-                value={String(form.mes)}
-                onValueChange={(v) => setForm({ ...form, mes: Number(v) })}
+                value={form.mes == null ? "none" : String(form.mes)}
+                onValueChange={(v) => setForm({ ...form, mes: v === "none" ? null : Number(v) })}
                 >
               <SelectTrigger>
               <SelectValue />
               </SelectTrigger>
 
       <SelectContent>
-    <SelectItem value="0">Sem mês específico</SelectItem>
+    <SelectItem value="none">Sem mês específico</SelectItem>
 
     {MONTHS.map((m, i) => (
       <SelectItem key={m} value={String(i + 1)}>
@@ -686,6 +686,7 @@ const Admin = () => {
     ))}
   </SelectContent>
 </Select>
+
               </div>
             </div>
             <div className="space-y-2">
