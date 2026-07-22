@@ -143,7 +143,15 @@ if (mappedSearch) {
                   title="Prepare-se para o próximo mês"
                   products={nextMonthProducts}
                 />
+                {noMonthProducts.length > 0 && (
+                  <ProductSection
+                    subtitle="Sempre disponíveis"
+                    title="Outros materiais"
+                    products={noMonthProducts}
+                  />
+                )}
               </>
+
             )}
           </TabsContent>
 
