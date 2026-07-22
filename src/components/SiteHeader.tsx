@@ -8,8 +8,11 @@ interface SiteHeaderProps {
 
 export const SiteHeader = ({ search, onSearchChange }: SiteHeaderProps) => {
   return (
-    <header className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-watercolor opacity-70" aria-hidden />
+    <header
+      className="relative overflow-hidden bg-center bg-cover bg-no-repeat"
+      style={{ backgroundImage: "url('/raffafe-cabecalho.webp')" }}
+    >
+      <div className="absolute inset-0 bg-white/20" aria-hidden />
       <div className="relative container mx-auto px-4 py-12 md:py-16 text-center">
         <h1 className="text-4xl text-foreground tracking-tight font-serif md:text-5xl">
           Raffafe<span className="text-primary">.arte</span>
