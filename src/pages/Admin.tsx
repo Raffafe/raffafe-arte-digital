@@ -40,7 +40,7 @@ interface FormState {
   titulo: string;
   preco: string;
   categoria: string;
-  mes: number;
+  mes: number | null;
   tema: string;
   publico: string;
   imagem_url: string;
@@ -53,7 +53,7 @@ const empty: FormState = {
   titulo: "",
   preco: "",
   categoria: CATEGORIES[0],
-  mes: 0,
+  mes: null,
   tema: "",
   publico: "",
   imagem_url: "",
@@ -61,6 +61,7 @@ const empty: FormState = {
   ativo: true,
   destaque_ordem: "",
 };
+
 
 interface AtividadeForm {
   id?: string;
