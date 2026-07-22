@@ -95,6 +95,8 @@ if (mappedSearch) {
 
   const currentMonthProducts = filtered.filter((p) => p.month === currentMonth);
   const nextMonthProducts = filtered.filter((p) => p.month === nextMonth);
+  const noMonthProducts = filtered.filter((p) => p.month == null);
+
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -141,7 +143,15 @@ if (mappedSearch) {
                   title="Prepare-se para o próximo mês"
                   products={nextMonthProducts}
                 />
+                {noMonthProducts.length > 0 && (
+                  <ProductSection
+                    subtitle="Sempre disponíveis"
+                    title="Outros materiais"
+                    products={noMonthProducts}
+                  />
+                )}
               </>
+
             )}
           </TabsContent>
 

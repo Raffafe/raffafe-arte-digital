@@ -15,12 +15,13 @@ export interface Product {
   title: string;
   price: number;
   category: Category;
-  month: number; // 1-12
+  month: number | null; // 1-12 ou null (sem mês específico)
   theme: string;
   audience: string;
   image: string;
   hotmartUrl: string;
 }
+
 
 export const CATEGORIES: Category[] = [
   "Datas Comemorativas",

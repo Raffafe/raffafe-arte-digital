@@ -40,7 +40,7 @@ interface FormState {
   titulo: string;
   preco: string;
   categoria: string;
-  mes: number;
+  mes: number | null;
   tema: string;
   publico: string;
   imagem_url: string;
@@ -53,7 +53,7 @@ const empty: FormState = {
   titulo: "",
   preco: "",
   categoria: CATEGORIES[0],
-  mes: 0,
+  mes: null,
   tema: "",
   publico: "",
   imagem_url: "",
@@ -61,6 +61,7 @@ const empty: FormState = {
   ativo: true,
   destaque_ordem: "",
 };
+
 
 interface AtividadeForm {
   id?: string;
@@ -247,7 +248,7 @@ const Admin = () => {
       titulo: p.titulo,
       preco: String(p.preco),
       categoria: p.categoria,
-      mes: p.mes ?? 0,
+      mes: p.mes ?? null,
       tema: p.tema ?? "",
       publico: p.publico ?? "",
       imagem_url: p.imagem_url ?? "",
@@ -276,6 +277,7 @@ const Admin = () => {
       ativo: form.ativo,
       destaque_ordem: form.destaque_ordem.trim() === "" ? null : (Number(form.destaque_ordem) || null),
     };
+
     const { error } = form.id
       ? await supabase.from("produtos").update(payload).eq("id", form.id)
       : await supabase.from("produtos").insert(payload);
@@ -667,15 +669,15 @@ const Admin = () => {
                 <Label>Mês</Label>
                
               <Select
-                value={String(form.mes)}
-                onValueChange={(v) => setForm({ ...form, mes: Number(v) })}
+                value={form.mes == null ? "none" : String(form.mes)}
+                onValueChange={(v) => setForm({ ...form, mes: v === "none" ? null : Number(v) })}
                 >
               <SelectTrigger>
               <SelectValue />
               </SelectTrigger>
 
       <SelectContent>
-    <SelectItem value="0">Sem mês específico</SelectItem>
+    <SelectItem value="none">Sem mês específico</SelectItem>
 
     {MONTHS.map((m, i) => (
       <SelectItem key={m} value={String(i + 1)}>
@@ -684,6 +686,7 @@ const Admin = () => {
     ))}
   </SelectContent>
 </Select>
+
               </div>
             </div>
             <div className="space-y-2">

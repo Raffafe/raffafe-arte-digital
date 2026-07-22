@@ -1,0 +1,1 @@
+ALTER TABLE public.produtos ALTER COLUMN mes DROP NOT NULL; ALTER TABLE public.produtos ALTER COLUMN mes DROP DEFAULT;
