@@ -34,6 +34,7 @@ import type { AdminUser, DbProduct } from "@/hooks/useProducts";
 import { getYouTubeId, type DbAtividade } from "@/hooks/useAtividades";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
+import { PinterestExportDialog } from "@/components/PinterestExportDialog";
 
 interface FormState {
   id?: string;
@@ -166,6 +167,7 @@ const Admin = () => {
     }
   };
   const [section, setSection] = useState<"produtos" | "atividades" | "usuarios">("produtos");
+  const [pinterestOpen, setPinterestOpen] = useState(false);
 
   const importFromHotmart = async () => {
     const url = form.link_hotmart.trim();
@@ -471,6 +473,8 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
+        <PinterestExportDialog open={pinterestOpen} onOpenChange={setPinterestOpen} products={items} />
+
         {section === "produtos" && (
           <section className="space-y-4">
             <div className="flex items-center justify-between">
@@ -478,7 +482,12 @@ const Admin = () => {
                 <h2 className="font-display text-3xl">Produtos</h2>
                 <p className="text-sm text-muted-foreground">{items.length} cadastrados</p>
               </div>
-              <Button onClick={openNew} className="rounded-full">+ Novo produto</Button>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" onClick={() => setPinterestOpen(true)} className="rounded-full">
+                  Exportar produtos para o Pinterest
+                </Button>
+                <Button onClick={openNew} className="rounded-full">+ Novo produto</Button>
+              </div>
             </div>
 
             <Card className="rounded-2xl">
